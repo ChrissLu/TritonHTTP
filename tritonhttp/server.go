@@ -160,18 +160,27 @@ func (s *Server) HandleGoodRequest(req *Request) (res *Response) {
 	if !strings.Contains(res.FilePath, DocRoot) {
 		// for security reason
 		res.HandleNotFound(req)
-	} else if _, err := os.Stat(res.FilePath); err != nil {
+		return res
+	}
+
+	Info, err := os.Stat(res.FilePath)
+	if err != nil {
 		res.HandleNotFound(req)
-	} else {
-		res.HandleOK()
-		if req.Close {
-			res.Headers["Connection"] = "close"
+		return res
+	}
+	if Info.IsDir() {
+		res.FilePath = filepath.Join(res.FilePath, "index.html")
+		_, err := os.Stat(res.FilePath)
+		if err != nil {
+			res.HandleNotFound(req)
+			return res
 		}
 	}
+	res.HandleOK(req)
 	return res
 }
 
-func (res *Response) HandleOK() {
+func (res *Response) HandleOK(req *Request) {
 	res.StatusCode = 200
 	res.Headers["Content-Type"] = MIMETypeByExtension(filepath.Ext(res.FilePath))
 	// file, err := os.Open(res.FilePath)
@@ -187,6 +196,9 @@ func (res *Response) HandleOK() {
 	}
 	res.Headers["Content-Length"] = strconv.FormatInt(Info.Size(), 10)
 	res.Headers["Last-Modified"] = FormatTime(Info.ModTime())
+	if req.Close {
+		res.Headers["Connection"] = "close"
+	}
 }
 func (res *Response) HandleNotFound(req *Request) {
 	res.StatusCode = 404
