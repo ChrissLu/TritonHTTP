@@ -63,8 +63,10 @@ func (res *Response) Write(w io.Writer) error {
 	}
 
 	if res.StatusCode == 400 {
-		if _, err := bw.WriteString("Connection: " + res.Headers["Connection"] + "\r\n"); err != nil {
-			return err
+		if _, ok := res.Headers["Connection"]; ok {
+			if _, err := bw.WriteString("Connection: " + res.Headers["Connection"] + "\r\n"); err != nil {
+				return err
+			}
 		}
 		if _, err := bw.WriteString("Date: " + res.Headers["Date"] + "\r\n"); err != nil {
 			return err
@@ -72,8 +74,10 @@ func (res *Response) Write(w io.Writer) error {
 	}
 
 	if res.StatusCode == 404 {
-		if _, err := bw.WriteString("Connection: " + res.Headers["Connection"] + "\r\n"); err != nil {
-			return err
+		if _, ok := res.Headers["Connection"]; ok {
+			if _, err := bw.WriteString("Connection: " + res.Headers["Connection"] + "\r\n"); err != nil {
+				return err
+			}
 		}
 		if _, err := bw.WriteString("Date: " + res.Headers["Date"] + "\r\n"); err != nil {
 			return err
