@@ -155,9 +155,9 @@ func (s *Server) HandleGoodRequest(req *Request) (res *Response) {
 
 	if res.FilePath[:len(DocRoot)] != DocRoot {
 		// for security reason
-		res.HandleNotFound()
+		res.HandleNotFound(req)
 	} else if _, err := os.Stat(res.FilePath); os.IsNotExist(err) {
-		res.HandleNotFound()
+		res.HandleNotFound(req)
 	} else {
 		res.HandleOK()
 		if req.Close {
@@ -184,10 +184,12 @@ func (res *Response) HandleOK() {
 	res.Headers["Content-Length"] = strconv.FormatInt(Info.Size(), 10)
 	res.Headers["Last-Modified"] = FormatTime(Info.ModTime())
 }
-func (res *Response) HandleNotFound() {
+func (res *Response) HandleNotFound(req *Request) {
 	res.StatusCode = 404
 	res.FilePath = ""
-	res.Headers["Connection"] = "close"
+	if req.Close {
+		res.Headers["Connection"] = "close"
+	}
 }
 
 func ReadLine(br *bufio.Reader) (string, error) {
