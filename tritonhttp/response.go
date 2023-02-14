@@ -63,7 +63,7 @@ func (res *Response) Write(w io.Writer) error {
 	}
 
 	if res.StatusCode == 400 {
-		if _, err := bw.WriteString("Connection" + res.Headers["Connection"] + "\r\n"); err != nil {
+		if _, err := bw.WriteString("Connection: " + res.Headers["Connection"] + "\r\n"); err != nil {
 			return err
 		}
 		if _, err := bw.WriteString("Date: " + res.Headers["Date"] + "\r\n"); err != nil {
