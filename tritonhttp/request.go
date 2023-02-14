@@ -36,7 +36,6 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 		return nil, fmt.Errorf("400")
 	}
 	req.Method = fields[0]
-	req.Sent_some_bytes = true
 	if req.Method != "GET" {
 		//fmt.Println(22222)
 		return nil, fmt.Errorf("400")
@@ -50,6 +49,7 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 		//fmt.Println(33333)
 		return nil, fmt.Errorf("400")
 	}
+	req.Sent_some_bytes = true
 
 	// read headers
 	req.Headers = make(map[string]string)
