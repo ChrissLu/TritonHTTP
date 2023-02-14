@@ -155,6 +155,7 @@ func (s *Server) HandleGoodRequest(req *Request) (res *Response) {
 	res.init()
 	DocRoot := s.VirtualHosts[req.Host]
 	res.FilePath = filepath.Join(DocRoot, req.URL)
+	res.FilePath = filepath.Clean(res.FilePath)
 
 	if res.FilePath[:len(DocRoot)] != DocRoot {
 		// for security reason
