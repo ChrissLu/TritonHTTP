@@ -32,19 +32,22 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 	//initial request line
 	fields := strings.SplitN(line, " ", 3)
 	if len(fields) != 3 {
-		fmt.Println(111111)
+		//fmt.Println(111111)
 		return nil, fmt.Errorf("400")
 	}
 	req.Method = fields[0]
 	req.Sent_some_bytes = true
 	if req.Method != "GET" {
-		fmt.Println(22222)
+		//fmt.Println(22222)
 		return nil, fmt.Errorf("400")
 	}
 	req.URL = fields[1]
+	if req.URL[0] != '/' {
+		return nil, fmt.Errorf("400")
+	}
 	req.Proto = fields[2]
-	if req.Proto != "HTTP/1.1" { //should be moved?
-		fmt.Println(33333)
+	if req.Proto != "HTTP/1.1" {
+		//fmt.Println(33333)
 		return nil, fmt.Errorf("400")
 	}
 
@@ -64,7 +67,7 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 
 		fields := strings.SplitN(line, ":", 2)
 		if len(fields) != 2 {
-			fmt.Println(4444)
+			//fmt.Println(4444)
 			return nil, fmt.Errorf("400")
 		}
 		key := CanonicalHeaderKey(strings.TrimSpace(fields[0]))
@@ -82,7 +85,7 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 	}
 
 	if !hasHost {
-		fmt.Println(5555)
+		//fmt.Println(5555)
 		return nil, fmt.Errorf("400")
 	}
 	return req, nil
