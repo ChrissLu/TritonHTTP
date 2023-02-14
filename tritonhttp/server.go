@@ -187,6 +187,7 @@ func (res *Response) HandleOK() {
 func (res *Response) HandleNotFound() {
 	res.StatusCode = 404
 	res.FilePath = ""
+	res.Headers["Connection"] = "close"
 }
 
 func ReadLine(br *bufio.Reader) (string, error) {
