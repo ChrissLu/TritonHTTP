@@ -76,7 +76,7 @@ func (s *Server) HandleConnection(conn net.Conn) {
 	br := bufio.NewReader(conn)
 	for {
 		// Set timeout
-		if err := conn.SetReadDeadline(time.Now().Add(5 * time.Second)); err != nil {
+		if err := conn.SetReadDeadline(time.Now().Add(4 * time.Second)); err != nil {
 			log.Printf("Failed to set timeout for connection %v", conn)
 			_ = conn.Close()
 			return
