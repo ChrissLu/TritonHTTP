@@ -60,17 +60,17 @@ func (s *Server) ListenAndServe() error {
 	}
 }
 
-func (s *Server) ValidateServerSetup() error {
-	Info, err := os.Stat(s.VirtualHosts)
-	if err != nil {
-		return err
-	}
-	if !Info.IsDir() {
-		return fmt.Errorf("not a Dir")
-	}
-	return nil
+// func (s *Server) ValidateServerSetup() error {
+// 	Info, err := os.Stat(s.VirtualHosts)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if !Info.IsDir() {
+// 		return fmt.Errorf("not a Dir")
+// 	}
+// 	return nil
 
-}
+// }
 
 func (s *Server) HandleConnection(conn net.Conn) {
 	br := bufio.NewReader(conn)
