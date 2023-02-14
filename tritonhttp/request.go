@@ -19,37 +19,37 @@ type Request struct {
 	Sent_some_bytes bool
 }
 
-func ReadRequest(br *bufio.Reader) (req *Request, err error) {
+func ReadRequest(br *bufio.Reader) (req *Request, received bool, err error) {
 	req = &Request{}
-	req.Sent_some_bytes = false
+	received = false
 
 	// Read start line
 	line, err := ReadLine(br)
 	if err != nil {
-		return nil, err
+		return nil, received, err
 	}
 
 	//initial request line
 	fields := strings.SplitN(line, " ", 3)
 	if len(fields) != 3 {
 		//fmt.Println(111111)
-		return nil, fmt.Errorf("400")
+		return nil, received, fmt.Errorf("400")
 	}
 	req.Method = fields[0]
 	if req.Method != "GET" {
 		//fmt.Println(22222)
-		return nil, fmt.Errorf("400")
+		return nil, received, fmt.Errorf("400")
 	}
 	req.URL = fields[1]
 	if req.URL[0] != '/' {
-		return nil, fmt.Errorf("400")
+		return nil, received, fmt.Errorf("400")
 	}
 	req.Proto = fields[2]
 	if req.Proto != "HTTP/1.1" {
 		//fmt.Println(33333)
-		return nil, fmt.Errorf("400")
+		return nil, received, fmt.Errorf("400")
 	}
-	req.Sent_some_bytes = true
+	received = true
 
 	// read headers
 	req.Headers = make(map[string]string)
@@ -58,7 +58,7 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 	for {
 		line, err := ReadLine(br)
 		if err != nil {
-			return nil, err
+			return nil, received, err
 		}
 		if line == "" {
 			// This marks header end
@@ -68,7 +68,7 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 		fields := strings.SplitN(line, ":", 2)
 		if len(fields) != 2 {
 			//fmt.Println(4444)
-			return nil, fmt.Errorf("400")
+			return nil, received, fmt.Errorf("400")
 		}
 		key := CanonicalHeaderKey(strings.TrimSpace(fields[0]))
 		value := strings.TrimSpace(fields[1])
@@ -86,7 +86,7 @@ func ReadRequest(br *bufio.Reader) (req *Request, err error) {
 
 	if !hasHost {
 		//fmt.Println(5555)
-		return nil, fmt.Errorf("400")
+		return nil, received, fmt.Errorf("400")
 	}
-	return req, nil
+	return req, received, nil
 }

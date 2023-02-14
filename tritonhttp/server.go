@@ -83,7 +83,7 @@ func (s *Server) HandleConnection(conn net.Conn) {
 		}
 
 		// Read next request from the client
-		req, err := ReadRequest(br)
+		req, received, err := ReadRequest(br)
 
 		// Handle EOF
 		if errors.Is(err, io.EOF) {
@@ -94,7 +94,7 @@ func (s *Server) HandleConnection(conn net.Conn) {
 
 		// Handle timeout
 		if err, ok := err.(net.Error); ok && err.Timeout() {
-			if !req.Sent_some_bytes {
+			if !received {
 				log.Printf("Connection to %v timed out", conn.RemoteAddr())
 				_ = conn.Close()
 				return
@@ -157,10 +157,10 @@ func (s *Server) HandleGoodRequest(req *Request) (res *Response) {
 	res.FilePath = filepath.Join(DocRoot, req.URL)
 	res.FilePath = filepath.Clean(res.FilePath)
 
-	if res.FilePath[:len(DocRoot)] != DocRoot {
+	if !strings.Contains(res.FilePath, DocRoot) {
 		// for security reason
 		res.HandleNotFound(req)
-	} else if _, err := os.Stat(res.FilePath); os.IsNotExist(err) {
+	} else if _, err := os.Stat(res.FilePath); err != nil {
 		res.HandleNotFound(req)
 	} else {
 		res.HandleOK()
