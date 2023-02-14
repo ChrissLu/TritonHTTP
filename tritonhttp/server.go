@@ -27,8 +27,8 @@ type Server struct {
 	// VirtualHosts contains a mapping from host name to the docRoot path
 	// (i.e. the path to the directory to serve static files from) for
 	// all virtual hosts that this server supports
-	VirtualHosts string
-	//VirtualHosts map[string]string
+	//VirtualHosts string
+	VirtualHosts map[string]string
 }
 
 // ListenAndServe listens on the TCP network address s.Addr and then
@@ -150,9 +150,10 @@ func (res *Response) HandleBadRequest() {
 func (s *Server) HandleGoodRequest(req *Request) (res *Response) {
 	res = &Response{}
 	res.init()
-	res.FilePath = filepath.Join(s.VirtualHosts, req.URL)
+	DocRoot := s.VirtualHosts[req.Host]
+	res.FilePath = filepath.Join(DocRoot, req.URL)
 
-	if res.FilePath[:len(s.VirtualHosts)] != s.VirtualHosts {
+	if res.FilePath[:len(DocRoot)] != DocRoot {
 		// for security reason
 		res.HandleNotFound()
 	} else if _, err := os.Stat(res.FilePath); os.IsNotExist(err) {
